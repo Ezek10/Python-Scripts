@@ -1,0 +1,73 @@
+"""Mi consigna (leela bien esta vez) (consejo, copiala en el main de tu proyecto, como resumen....)
+Tu trabajo es crear una interfaz grafica (pantalla), en la cual existan 2 objetos (no se ahora si en python se pueden definir clases, pero si se puede, esa es la idea)
+-Los objetos no tienen por que tener forma definida, podes hacer un punto o un rectangulo (puntos extra si tienen un pixelart)
+-Objeto_1 debe comenzar estático.
+-Objeto_2 debe comenzar con una velocidad (hacia Objeto_1).
+-Objeto_2 debe tener una Masa2 = Masa1*(100^n)
+-los objetos colisionan entre si con choques ELÁSTICOS (física, no se pierde energía en el impacto.)
+-No hay fricción.
+-Si Objeto_1 colisiona con el borde de la ventana (no puede "spawnear" pegado a esta), rebota elasticamente como si impactara un objeto de masa INFINITA (basicamente cambia de dirección con su misma velocidad).
+
+Esas son las reglas del programa. Ya que ya sabes hacer cosas graficas, te permito revisar tus cosas (o las de la facu digamos) pero trata de no buscar en internet, ya que es un problema conocido.
+
+Lo mas importante es las clases de los objetos (que tengan variables de posicion, velocidad, y todas esas cosas, para mas adelante).
+y el tema de colisiones.
+si queres, podes agregar el tema del proyecto anterior (mandar wpp) para enviarme la cuenta de colisiones.
+podes buscar la formula del choque elastico si queres xD (no me la acuerdo de memoria)"""
+
+import tkinter as tk
+import numpy as np
+
+class Objetos ():
+
+    def __init__(self,vel=0,posX=0,masa=1):
+        """Constructor"""
+        self.__masa__ = masa
+        self.__velocidad__ = vel
+        self.__posision__ = posX
+    
+    def GetMasa(self):
+        return self.__masa__
+
+    def GetVelocidad(self):
+        return self.__velocidad__
+
+    def SetVelocidad(self,vel):
+        self.__velocidad__ = vel
+
+def Choque(objeto1 = Objetos(), objeto2=Objetos(), pared=True):
+    if not hasattr(Choque,"contador"):
+        Choque.contador = 0
+    else:
+        Choque.contador += 1
+    
+    if pared:
+        objeto1.SetVelocidad (-objeto1.GetVelocidad())
+    else:
+        nuevaVelocidadObjeto1 = (objeto1.GetVelocidad()*(objeto1.GetMasa() - objeto2.GetMasa()) + 2*objeto2.GetMasa()*objeto2.GetVelocidad())/(objeto1.GetMasa + objeto2.GetMasa())
+        nuevaVelocidadObjeto2 = (objeto2.GetVelocidad()*(objeto2.GetMasa() - objeto1.GetMasa()) + 2*objeto1.GetMasa()*objeto1.GetVelocidad())/(objeto2.GetMasa + objeto1.GetMasa())
+        objeto1.SetVelocidad(nuevaVelocidadObjeto1)
+        objeto2.SetVelocidad(nuevaVelocidadObjeto2)
+
+class Simulador():
+
+    def __init__(self,root):
+        self.ventana = root
+        self.ventana.protocol('WM_DELETE_WINDOW', self.Destructor)
+        self.objeto1 = Objetos(vel = 1, ener = 0, posX = 0.2, masa = 1)
+        self.objeto2 = Objetos(vel = 0, ener = 0, posX = 0.8, masa = 10000)
+
+    def Destructor(self):
+        self.ventana.destroy()
+        self.ventana.quit()
+
+def main():
+    width = 300
+    height = 300
+    root = tk.Tk()
+    Simulador(root)
+    root.geometry("{0}x{1}".format(width,height))
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()
