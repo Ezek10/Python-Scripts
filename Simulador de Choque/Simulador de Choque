@@ -16,12 +16,14 @@ si queres, podes agregar el tema del proyecto anterior (mandar wpp) para enviarm
 podes buscar la formula del choque elastico si queres xD (no me la acuerdo de memoria)"""
 
 import tkinter as tk
+from tkinter.constants import *
 import numpy as np
 
 class Objetos ():
 
-    def __init__(self,vel=0,posX=0,masa=1):
+    def __init__(self,vel=0,posX=0,masa=1,canvas=tk.Canvas()):
         """Constructor"""
+        #self.__cuadrado__ = canvas.create_rectangle()
         self.__masa__ = masa
         self.__velocidad__ = vel
         self.__posision__ = posX
@@ -51,23 +53,31 @@ def Choque(objeto1 = Objetos(), objeto2=Objetos(), pared=True):
 
 class Simulador():
 
-    def __init__(self,root):
-        self.ventana = root
+    def __init__(self):
+        width = 300
+        height = 300
+        self.ventana = tk.Tk()
         self.ventana.protocol('WM_DELETE_WINDOW', self.Destructor)
-        self.objeto1 = Objetos(vel = 1, ener = 0, posX = 0.2, masa = 1)
-        self.objeto2 = Objetos(vel = 0, ener = 0, posX = 0.8, masa = 10000)
+        self.canvas = tk.Canvas()
+        self.canvas.pack(fill=BOTH, expand=1)
+        self.objeto1 = Objetos(vel = 1, posX = 0.2, masa = 1, canvas = self.canvas)
+        self.objeto2 = Objetos(vel = 0, posX = 0.8, masa = 10000, canvas = self.canvas)
+        self.ventana.geometry("{0}x{1}".format(width,height))
+        self.ventana.minsize(width,height)
+        self.ventana.maxsize(width,height)
+        self.Update()
+        self.ventana.mainloop()
 
+    def Update (self):
+        cuadrado1 = self.canvas.create_rectangle(120,120,140,140,fill = "#fb0")
+        cuadrado2 = self.canvas.create_rectangle(200,120,220,140,fill = "#fb0")
+    
     def Destructor(self):
         self.ventana.destroy()
         self.ventana.quit()
 
 def main():
-    width = 300
-    height = 300
-    root = tk.Tk()
-    Simulador(root)
-    root.geometry("{0}x{1}".format(width,height))
-    root.mainloop()
+    Simulador()
 
 if __name__ == "__main__":
     main()
