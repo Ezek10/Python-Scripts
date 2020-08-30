@@ -93,7 +93,7 @@ class Simulador():
         if (self.canvas.coords(self.cuadrado1)[0] <= 0.1):
             self.Contador = Choque(self.objeto1)
         
-        self.texto.set("Colisiones: {0}".format(self.Contador))
+        self.texto.set("Colisiones: {0}".format(Contador))
 
         self.ventana.after(10,self.Update)
 
