@@ -17,16 +17,13 @@ podes buscar la formula del choque elastico si queres xD (no me la acuerdo de me
 
 import tkinter as tk
 from tkinter.constants import *
-import numpy as np
 
 class Objetos ():
 
-    def __init__(self,vel=0,posX=0,masa=1,canvas=tk.Canvas()):
+    def __init__(self,vel=0,masa=1):
         """Constructor"""
-        #self.__cuadrado__ = canvas.create_rectangle()
         self.__masa__ = masa
         self.__velocidad__ = vel
-        self.__posision__ = posX
     
     def GetMasa(self):
         return self.__masa__
@@ -39,42 +36,69 @@ class Objetos ():
 
 def Choque(objeto1 = Objetos(), objeto2=Objetos(), pared=True):
     if not hasattr(Choque,"contador"):
-        Choque.contador = 0
+        Choque.contador = 1
     else:
         Choque.contador += 1
     
     if pared:
         objeto1.SetVelocidad (-objeto1.GetVelocidad())
     else:
-        nuevaVelocidadObjeto1 = (objeto1.GetVelocidad()*(objeto1.GetMasa() - objeto2.GetMasa()) + 2*objeto2.GetMasa()*objeto2.GetVelocidad())/(objeto1.GetMasa + objeto2.GetMasa())
-        nuevaVelocidadObjeto2 = (objeto2.GetVelocidad()*(objeto2.GetMasa() - objeto1.GetMasa()) + 2*objeto1.GetMasa()*objeto1.GetVelocidad())/(objeto2.GetMasa + objeto1.GetMasa())
+        nuevaVelocidadObjeto1 = (objeto1.GetVelocidad()*(objeto1.GetMasa() - objeto2.GetMasa()) + 2*objeto2.GetMasa()*objeto2.GetVelocidad())/(objeto1.GetMasa() + objeto2.GetMasa())
+        nuevaVelocidadObjeto2 = (objeto2.GetVelocidad()*(objeto2.GetMasa() - objeto1.GetMasa()) + 2*objeto1.GetMasa()*objeto1.GetVelocidad())/(objeto2.GetMasa() + objeto1.GetMasa())
         objeto1.SetVelocidad(nuevaVelocidadObjeto1)
         objeto2.SetVelocidad(nuevaVelocidadObjeto2)
+    
+    return Choque.contador
 
 class Simulador():
 
     def __init__(self):
-        width = 300
-        height = 300
+        self.width = 300
+        self.height = 300
+        self.Contador = 0
         self.ventana = tk.Tk()
-        self.ventana.protocol('WM_DELETE_WINDOW', self.Destructor)
-        self.canvas = tk.Canvas()
-        self.canvas.pack(fill=BOTH, expand=1)
-        self.objeto1 = Objetos(vel = 1, posX = 0.2, masa = 1, canvas = self.canvas)
-        self.objeto2 = Objetos(vel = 0, posX = 0.8, masa = 10000, canvas = self.canvas)
-        self.ventana.geometry("{0}x{1}".format(width,height))
-        self.ventana.minsize(width,height)
-        self.ventana.maxsize(width,height)
+        self.ventana.geometry("300x300")
+        self.ventana.title("Simulador")
+        self.canvas = tk.Canvas(self.ventana)
+        self.canvas.pack(fill = BOTH, expand = YES)
+        self.CreateObjetos()
         self.Update()
         self.ventana.mainloop()
 
-    def Update (self):
-        cuadrado1 = self.canvas.create_rectangle(120,120,140,140,fill = "#fb0")
-        cuadrado2 = self.canvas.create_rectangle(200,120,220,140,fill = "#fb0")
+    def CreateObjetos (self):
+        
+        posY = 0.5
+        posX1 = 0.2
+        posX2 = 0.8
+        tamañoCuadrados = 20
+        n = 3
+        self.texto = tk.StringVar()
+        self.texto.set("Colisiones: 0")
+        
+        self.Label = tk.Label(self.ventana, textvariable = self.texto)
+        self.Label.pack(side = TOP, fill = X)
+        self.objeto1 = Objetos(vel = 0, masa = 1)
+        self.objeto2 = Objetos(vel = -1, masa = 100**n)
+        self.cuadrado1 = self.canvas.create_rectangle(posX1 * self.width, posY * self.height, posX1 * self.width + tamañoCuadrados ,posY * self.height + tamañoCuadrados, fill = "#fb0")
+        self.cuadrado2 = self.canvas.create_rectangle(posX2 * self.width, posY * self.height, posX2 *self. width + tamañoCuadrados ,posY * self.height + tamañoCuadrados, fill = "#fb0")
     
+    def Update (self):
+
+        self.canvas.move(self.cuadrado1,self.objeto1.GetVelocidad(),0)
+        self.canvas.move(self.cuadrado2,self.objeto2.GetVelocidad(),0)
+        
+        if (self.canvas.coords(self.cuadrado1)[2] >= self.canvas.coords(self.cuadrado2)[0]):
+            self.Contador = Choque(self.objeto1,self.objeto2,pared = False)
+
+        if (self.canvas.coords(self.cuadrado1)[0] <= 0.1):
+            self.Contador = Choque(self.objeto1)
+        
+        self.texto.set("Colisiones: {0}".format(self.Contador))
+
+        self.ventana.after(10,self.Update)
+
     def Destructor(self):
-        self.ventana.destroy()
-        self.ventana.quit()
+        pass
 
 def main():
     Simulador()
